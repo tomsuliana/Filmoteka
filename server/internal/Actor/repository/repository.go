@@ -9,4 +9,5 @@ type ActorRepositoryI interface {
 	UpdateActor(actor *entity.Actor) error
 	GetActorById(id uint) (*entity.Actor, error)
 	DeleteActor(id uint) error
+	GetActorByName(name string, surname string) (uint, error)
 }

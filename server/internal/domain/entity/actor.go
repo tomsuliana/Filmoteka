@@ -1,11 +1,11 @@
 package entity
 
 type Actor struct {
-	ID       uint   `json:"id"`
-	Name     string `json:"name"`
-	Surname  string `json:"surname"`
-	Birthday string `json:"birthday"`
-	Gender   string `json:"gender"`
+	ID       uint   `json:"Id"`
+	Name     string `json:"Name"`
+	Surname  string `json:"Surname"`
+	Birthday string `json:"Birthday"`
+	Gender   string `json:"Gender"`
 }
 
 type RespID struct {

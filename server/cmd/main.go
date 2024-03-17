@@ -12,6 +12,9 @@ import (
 	actorDel "server/server/internal/Actor/delivery"
 	actorRep "server/server/internal/Actor/repository/postgres"
 	actorUsecase "server/server/internal/Actor/usecase"
+	filmDel "server/server/internal/Film/delivery"
+	filmRep "server/server/internal/Film/repository/postgres"
+	filmUsecase "server/server/internal/Film/usecase"
 	"server/server/internal/middleware"
 )
 
@@ -76,7 +79,12 @@ func main() {
 	actorUC := actorUsecase.NewActorUsecase(actorRepo)
 	actorHandler := actorDel.NewActorHandler(actorUC, logger)
 
+	filmRepo := filmRep.NewFilmRepo(db)
+	filmUC := filmUsecase.NewFilmUsecase(filmRepo, actorRepo)
+	filmHandler := filmDel.NewFilmHandler(filmUC, logger)
+
 	actorHandler.RegisterHandler(router)
+	filmHandler.RegisterHandler(router)
 
 	router.Use(middleware.PanicMiddleware)
 	router.Use(logger.ACLogMiddleware)

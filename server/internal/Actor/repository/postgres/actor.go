@@ -59,3 +59,16 @@ func (repo *ActorRepo) DeleteActor(id uint) error {
 	}
 	return nil
 }
+
+func (repo *ActorRepo) GetActorByName(name string, surname string) (uint, error) {
+	actor := &entity.Actor{}
+	row := repo.DB.QueryRow(`SELECT id FROM actor WHERE name = $1 and surname = $2`, name, surname)
+	err := row.Scan(&actor.ID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return 0, nil
+		}
+		return 0, err
+	}
+	return actor.ID, nil
+}
