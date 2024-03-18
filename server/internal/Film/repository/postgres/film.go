@@ -154,3 +154,77 @@ func (repo *FilmRepo) GetActorsByFilm(filmId uint) ([]*entity.Actor, error) {
 	}
 	return Actors, nil
 }
+
+func (repo *FilmRepo) SearchFilms(word string) ([]*entity.Film, error) {
+	rows, err := repo.DB.Query(`SELECT id, name, description, release_date, rating
+							    FROM film 
+								WHERE LOWER(name) 
+								LIKE LOWER('%' || $1 || '%')
+								ORDER BY rating DESC`, word)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
+	defer rows.Close()
+	var Films = []*entity.Film{}
+	for rows.Next() {
+		film := &entity.Film{}
+		err = rows.Scan(
+			&film.ID,
+			&film.Name,
+			&film.Description,
+			&film.ReleaseDate,
+			&film.Rating,
+		)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				return nil, nil
+			}
+			return nil, err
+		}
+		Films = append(Films, film)
+	}
+	return Films, nil
+}
+
+func (repo *FilmRepo) GetFilmsByActor(actor *entity.Actor) ([]*entity.Film, error) {
+	rows, err := repo.DB.Query(`SELECT film.id, film.name, description, release_date, rating
+								FROM actor_film af 
+								INNER JOIN film ON af.film_id=film.id
+								INNER JOIN actor ON af.actor_id=actor.id 
+								WHERE actor.id = $1
+								ORDER BY rating DESC`, actor.ID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
+	defer rows.Close()
+	var Films = []*entity.Film{}
+	var count = 0
+	for rows.Next() {
+		count++
+		film := &entity.Film{}
+		err = rows.Scan(
+			&film.ID,
+			&film.Name,
+			&film.Description,
+			&film.ReleaseDate,
+			&film.Rating,
+		)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				return nil, nil
+			}
+			return nil, err
+		}
+		Films = append(Films, film)
+	}
+	if count == 0 {
+		return nil, entity.ErrNotFound
+	}
+	return Films, nil
+}

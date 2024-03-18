@@ -15,6 +15,7 @@ type FilmUsecaseI interface {
 	DeleteActorFromFilm(actor *entity.Actor, filmId uint) error
 	DeleteFilm(filmId uint) error
 	GetFilms(name bool, releaseDate bool) ([]*entity.FilmWithActors, error)
+	Search(word string) ([]*entity.FilmWithActors, error)
 }
 
 type FilmUsecase struct {
@@ -175,4 +176,48 @@ func (fu FilmUsecase) GetFilms(name bool, releaseDate bool) ([]*entity.FilmWithA
 	}
 
 	return filmsWithActors, nil
+}
+
+func (fu FilmUsecase) Search(word string) ([]*entity.FilmWithActors, error) {
+	films, err := fu.filmRepo.SearchFilms(word)
+	if err != nil {
+		return nil, err
+	}
+
+	filmset := make(map[uint]bool)
+	for _, film := range films {
+		filmset[film.ID] = true
+	}
+
+	actors, err := fu.actorRepo.SearchActors(word)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, actor := range actors {
+		actorFilms, err := fu.filmRepo.GetFilmsByActor(actor)
+		if err != nil && err != entity.ErrNotFound {
+			return nil, err
+		}
+
+		for _, actorFilm := range actorFilms {
+			if !filmset[actorFilm.ID] {
+				films = append(films, actorFilm)
+				filmset[actorFilm.ID] = true
+			}
+		}
+	}
+
+	filmsWithActors := []*entity.FilmWithActors{}
+	for _, film := range films {
+		actors, err := fu.filmRepo.GetActorsByFilm(film.ID)
+		if err != nil {
+			return nil, err
+		}
+		filmwithacts := entity.ToFilmWithActors(film, actors)
+		filmsWithActors = append(filmsWithActors, filmwithacts)
+	}
+
+	return filmsWithActors, nil
+
 }

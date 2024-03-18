@@ -13,4 +13,6 @@ type FilmRepositoryI interface {
 	DeleteFilm(id uint) error
 	GetFilms(name bool, releaseDate bool) ([]*entity.Film, error)
 	GetActorsByFilm(filmId uint) ([]*entity.Actor, error)
+	SearchFilms(word string) ([]*entity.Film, error)
+	GetFilmsByActor(actor *entity.Actor) ([]*entity.Film, error)
 }

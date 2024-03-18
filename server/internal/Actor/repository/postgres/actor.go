@@ -41,7 +41,13 @@ func (repo *ActorRepo) UpdateActor(actor *entity.Actor) error {
 func (repo *ActorRepo) GetActorById(id uint) (*entity.Actor, error) {
 	actor := &entity.Actor{}
 	row := repo.DB.QueryRow(`SELECT id, name, surname, birthday, gender FROM actor WHERE id = $1`, id)
-	err := row.Scan(&actor.ID, &actor.Name, &actor.Surname, &actor.Birthday, &actor.Gender)
+	err := row.Scan(
+		&actor.ID,
+		&actor.Name,
+		&actor.Surname,
+		&actor.Birthday,
+		&actor.Gender,
+	)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
@@ -71,4 +77,38 @@ func (repo *ActorRepo) GetActorByName(name string, surname string) (uint, error)
 		return 0, err
 	}
 	return actor.ID, nil
+}
+
+func (repo *ActorRepo) SearchActors(word string) ([]*entity.Actor, error) {
+	rows, err := repo.DB.Query(`SELECT id, name, surname, birthday, gender
+							    FROM actor 
+								WHERE LOWER(name) 
+								LIKE LOWER('%' || $1 || '%')
+								OR LOWER(surname) LIKE LOWER('%' || $1 || '%')`, word)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
+	defer rows.Close()
+	var Actors = []*entity.Actor{}
+	for rows.Next() {
+		actor := &entity.Actor{}
+		err = rows.Scan(
+			&actor.ID,
+			&actor.Name,
+			&actor.Surname,
+			&actor.Birthday,
+			&actor.Gender,
+		)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				return nil, nil
+			}
+			return nil, err
+		}
+		Actors = append(Actors, actor)
+	}
+	return Actors, nil
 }

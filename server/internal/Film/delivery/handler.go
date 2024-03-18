@@ -41,6 +41,7 @@ func (handler *FilmHandler) RegisterHandler(router *mux.Router) {
 	router.HandleFunc("/api/films/{id:[0-9]+}/deleteactor", handler.DeleteActorFromFilm).Methods(http.MethodPatch)
 	router.HandleFunc("/api/films/{id:[0-9]+}", handler.UpdateFilm).Methods(http.MethodPatch)
 	router.HandleFunc("/api/films/{id:[0-9]+}", handler.DeleteFilm).Methods(http.MethodDelete)
+	router.HandleFunc("/api/films/", handler.Search).Methods(http.MethodGet)
 }
 
 func (handler *FilmHandler) CreateFilm(w http.ResponseWriter, r *http.Request) {
@@ -311,6 +312,31 @@ func (handler *FilmHandler) GetFilmList(w http.ResponseWriter, r *http.Request) 
 	}
 
 	films, err := handler.films.GetFilms(nameParameter, releaseDateParameter)
+
+	if err != nil {
+		handler.logger.LogError("problems with getting films", err, w.Header().Get("request-id"), r.URL.Path)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	body := films
+
+	encoder := json.NewEncoder(w)
+	err = encoder.Encode(&Result{Body: body})
+
+	if err != nil {
+		handler.logger.LogError("problems with marshalling json", err, w.Header().Get("request-id"), r.URL.Path)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+}
+
+func (handler *FilmHandler) Search(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	search := r.URL.Query().Get("search")
+
+	films, err := handler.films.Search(search)
 
 	if err != nil {
 		handler.logger.LogError("problems with getting films", err, w.Header().Get("request-id"), r.URL.Path)
