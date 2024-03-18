@@ -22,6 +22,44 @@ definitions:
         type: string
       Gender:
         type: string
+  Film:
+    properties:
+      ID:
+        type: integer
+      Name:
+        type: string
+      Description:
+        type: string
+      ReleaseDate:
+        type: string
+      Rating:
+        type: number
+      Actors:
+          type: array
+          items:
+            properties:
+              ID:
+                type: integer
+              Name:
+                type: string
+              Surname:
+                type: string
+              Birthday:
+                type: string
+              Gender:
+                type: string
+  FilmWithoutActors:
+    properties:
+      ID:
+        type: integer
+      Name:
+        type: string
+      Description:
+        type: string
+      ReleaseDate:
+        type: string
+      Rating:
+        type: number
     type: object
   Actors:
     type: array
@@ -51,6 +89,35 @@ definitions:
                 type: string
               Rating:
                 type: number
+  Films:
+    type: array
+    items:
+      properties:
+        ID:
+          type: integer
+        Name:
+          type: string
+        Description:
+          type: string
+        ReleaseDate:
+          type: string
+        Rating:
+          type: number
+        Actors:
+          type: array
+          items:
+            properties:
+              ID:
+                type: integer
+              Name:
+                type: string
+              Surname:
+                type: string
+              Birthday:
+                type: string
+              Gender:
+                type: string
+              
         
 info:
   termsOfService: http://swagger.io/terms/
@@ -58,7 +125,7 @@ info:
   license:
     name: Apache 2.0
   title: Filmoteka API
-  version: "1.0"
+  version: "2.0"
 externalDocs:
   description: Find out more about Swagger
   url: http://swagger.io
@@ -67,6 +134,8 @@ tags:
     description: Operations about users
   - name: actors
     description: Operations about actors
+  - name: films
+    description: Operations about films
   
 
 paths:
@@ -139,7 +208,7 @@ paths:
         "400":
           description: bad request
         "401":
-          description: unauthorized or not admin
+          description: unauthorized 
       summary: Get list of actors with their films
       tags:
       - actors
@@ -166,5 +235,220 @@ paths:
       summary: Add actor
       tags:
       - actors
+  /api/actors/{id}:
+    patch:
+      consumes:
+      - application/json
+      description: Editing actors
+      parameters:
+      - description: New fields to edit actor
+        in: body
+        name: actor
+        required: true
+        schema:
+          $ref: '#/definitions/Actor'
+      - description: Actor id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: actor edited
+        "400":
+          description: bad request
+        "401":
+          description: unauthorized or not admin
+      summary: Edit actor
+      tags:
+      - actors
+    delete:
+      description: Deleting actors
+      parameters:
+      - description: Actor id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: actor deleted
+        "400":
+          description: bad request
+        "401":
+          description: unauthorized or not admin
+      summary: Delete actor
+      tags:
+      - actors
+  /api/films:
+    get:
+      description: Get list of films with their actors
+      parameters:
+      - description: name or release date parameters
+        in: query
+        name: name or release date
+        required: false
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: films got
+          schema: 
+            $ref: '#/definitions/Films'
+        "400":
+          description: bad request
+        "401":
+          description: unauthorized 
+      summary: Get list of films with their actors
+      tags:
+      - films
+    post:
+      consumes:
+      - application/json
+      description: Adding films
+      parameters:
+      - description: Film with actors (artors should be in database)
+        in: body
+        name: film
+        required: true
+        schema:
+          $ref: '#/definitions/Film'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: film created
+        "400":
+          description: bad request
+        "401":
+          description: unauthorized or not admin
+      summary: Add film
+      tags:
+      - films
+  /api/films/{id}/addactor:
+    patch:
+      consumes:
+      - application/json
+      description: Adding actors to film
+      parameters:
+      - description: Actor to add
+        in: body
+        name: actor
+        required: true
+        schema:
+          $ref: '#/definitions/Actor'
+      - description: Film id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: actor added to film
+        "400":
+          description: bad request
+        "401":
+          description: unauthorized or not admin
+      summary: Add actor to film
+      tags:
+      - films
+  /api/films/{id}/deleteactor:
+    patch:
+      consumes:
+      - application/json
+      description: Deleting actors from film
+      parameters:
+      - description: Actor to delete
+        in: body
+        name: actor
+        required: true
+        schema:
+          $ref: '#/definitions/Actor'
+      - description: Film id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: actor deleted from film
+        "400":
+          description: bad request
+        "401":
+          description: unauthorized or not admin
+      summary: Delete actor from film
+      tags:
+      - films
+  /api/films/{id}:
+    patch:
+      consumes:
+      - application/json
+      description: Editing films
+      parameters:
+      - description: New fields to edit film
+        in: body
+        name: film
+        required: true
+        schema:
+          $ref: '#/definitions/FilmWithoutActors'
+      - description: Film id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: film edited
+        "400":
+          description: bad request
+        "401":
+          description: unauthorized or not admin
+      summary: Edit film
+      tags:
+      - films
+    delete:
+      description: Deleting films
+      parameters:
+      - description: Film id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: film deleted
+        "400":
+          description: bad request
+        "401":
+          description: unauthorized or not admin
+      summary: Delete film
+      tags:
+      - films
+  /api/films/:
+    get:
+      description: Get list of films with search fragment in name or in some actors
+      parameters:
+      - description: search fragment
+        in: query
+        name: search
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: films got
+          schema: 
+            $ref: '#/definitions/Films'
+        "400":
+          description: bad request
+        "401":
+          description: unauthorized 
+      summary: Get list of films with search fragment in name or in some actors
+      tags:
+      - films
+      
+    
 
 swagger: "2.0"
