@@ -41,7 +41,6 @@ func (handler *ActorHandler) RegisterHandler(router *mux.Router) {
 }
 
 func (handler *ActorHandler) CreateActor(w http.ResponseWriter, r *http.Request) {
-
 	w.Header().Set("Content-Type", "application/json")
 	if r.Header.Get("Content-Type") != "application/json" {
 		handler.logger.LogError("bad content-type", entity.ErrBadContentType, w.Header().Get("request-id"), r.URL.Path)
@@ -129,7 +128,7 @@ func (handler *ActorHandler) UpdateActor(w http.ResponseWriter, r *http.Request)
 	err = handler.actors.UpdateActor(updateActor)
 	if err != nil {
 		if err == entity.ErrNotFound {
-			handler.logger.LogError("person not found", err, w.Header().Get("request-id"), r.URL.Path)
+			handler.logger.LogError("actor not found", err, w.Header().Get("request-id"), r.URL.Path)
 			w.WriteHeader(http.StatusNotFound)
 			return
 		}
@@ -143,7 +142,7 @@ func (handler *ActorHandler) UpdateActor(w http.ResponseWriter, r *http.Request)
 			w.WriteHeader(http.StatusInternalServerError)
 		}
 
-		handler.logger.LogError("problems updating person", err, w.Header().Get("request-id"), r.URL.Path)
+		handler.logger.LogError("problems updating actor", err, w.Header().Get("request-id"), r.URL.Path)
 		return
 	}
 }

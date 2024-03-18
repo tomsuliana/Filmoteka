@@ -26,3 +26,14 @@ func ToFilm(filmWithActors *FilmWithActors) *Film {
 		Rating:      filmWithActors.Rating,
 	}
 }
+
+func ToFilmWithActors(film *Film, actors []*Actor) *FilmWithActors {
+	return &FilmWithActors{
+		ID:          film.ID,
+		Name:        film.Name,
+		Description: film.Description,
+		ReleaseDate: film.ReleaseDate,
+		Rating:      film.Rating,
+		Actors:      actors,
+	}
+}

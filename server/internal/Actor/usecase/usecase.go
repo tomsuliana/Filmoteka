@@ -9,7 +9,7 @@ import (
 
 type ActorUsecaseI interface {
 	CreateActor(newActor *entity.Actor) (uint, error)
-	UpdateActor(newPerson *entity.Actor) error
+	UpdateActor(newActor *entity.Actor) error
 	DeleteActor(id uint) error
 }
 
