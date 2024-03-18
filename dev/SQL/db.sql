@@ -1,0 +1,68 @@
+DROP TABLE IF EXISTS actor CASCADE;
+DROP TABLE IF EXISTS film CASCADE;
+DROP TABLE IF EXISTS actor_film CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
+
+CREATE TABLE IF NOT EXISTS public.ACTOR
+(
+    ID serial NOT NULL,
+    NAME varchar NOT NULL,
+	SURNAME varchar NOT NULL,
+	BIRTHDAY date NOT NULL,
+    GENDER varchar NOT NULL,
+	CREATED_AT TIMESTAMP WITH TIME ZONE default NOW() NOT NULL,
+	UPDATED_AT TIMESTAMP WITH TIME ZONE default NOW(),
+    PRIMARY KEY (ID)
+);
+
+CREATE OR REPLACE FUNCTION trigger_set_timestamp()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER set_timestamp
+BEFORE UPDATE ON ACTOR
+FOR EACH ROW
+EXECUTE PROCEDURE trigger_set_timestamp();
+
+CREATE TABLE IF NOT EXISTS public.FILM
+(
+    ID serial NOT NULL,
+    NAME varchar NOT NULL,
+	DESCRIPTION varchar NOT NULL,
+	RELEASE_DATE date NOT NULL,
+    RATING numeric(2,1) default 0.0 NOT NULL,
+	CREATED_AT TIMESTAMP WITH TIME ZONE default NOW() NOT NULL,
+	UPDATED_AT TIMESTAMP WITH TIME ZONE default NOW(),
+    PRIMARY KEY (ID)
+);
+
+CREATE TRIGGER set_timestamp
+BEFORE UPDATE ON FILM
+FOR EACH ROW
+EXECUTE PROCEDURE trigger_set_timestamp();
+
+CREATE TABLE IF NOT EXISTS public.ACTOR_FILM
+(
+    id SERIAL NOT NULL,
+    actor_id INT REFERENCES public.actor(id) NOT NULL,
+    film_id INT REFERENCES public.film(id) NOT NULL,
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS public.USERS
+(
+    ID serial NOT NULL,
+    NAME varchar NOT NULL,
+	PASSWORD varchar NOT NULL,
+	STATUS varchar NOT NULL,
+	CREATED_AT TIMESTAMP WITH TIME ZONE default NOW() NOT NULL,
+	UPDATED_AT TIMESTAMP WITH TIME ZONE default NOW(),
+    PRIMARY KEY (ID)
+);
+
+INSERT INTO USERS (name, password, status) VALUES ('user', 'user', 'user');
+INSERT INTO USERS (name, password, status) VALUES ('admin', 'admin', 'admin');

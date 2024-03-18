@@ -1,0 +1,127 @@
+definitions:
+  User:
+    properties:
+      ID:
+        type: integer
+      Username:
+        type: string
+      Password:
+        type: string
+      Status:
+        type: string
+    type: object
+  Actor:
+    properties:
+      ID:
+        type: integer
+      Name:
+        type: string
+      Surname:
+        type: string
+      Birthday:
+        type: string
+      Gender:
+        type: string
+    type: object
+info:
+  termsOfService: http://swagger.io/terms/
+  contact: {}
+  license:
+    name: Apache 2.0
+  title: Filmoteka API
+  version: "1.0"
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+  - url: https://petstore3.swagger.io/api/v3
+tags:
+  - name: users
+    description: Operations about users
+  - name: actors
+    description: Operations about actors
+  
+
+paths:
+  /api/login:
+    post:
+      consumes:
+      - application/json
+      description: Log in user
+      parameters:
+      - description: user object for login
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success login User return cookie
+          schema:
+            type: string
+        "400":
+          description: bad request
+          schema: {}
+        "404":
+          description: not found
+          schema: {}
+        "500":
+          description: internal server error
+          schema: {}
+      summary: Log in user
+      tags:
+      - users
+  /api/logout:
+    get:
+      consumes:
+      - application/json
+      description: Log out user
+      parameters:
+      - description: Log out user
+        in: header
+        name: cookie
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: void" "success log out
+        "400":
+          description: bad request
+          schema: {}
+        "401":
+          description: unauthorized
+          schema: {}
+      summary: Log out user
+      tags:
+      - users
+  /api/actors:
+    post:
+      consumes:
+      - application/json
+      description: Adding actors
+      parameters:
+      - description: Adding actors
+        in: body
+        name: actor
+        required: true
+        schema:
+          $ref: '#/definitions/Actor'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: actor created
+        "400":
+          description: bad request
+        "401":
+          description: unauthorized or not admin
+      summary: Add actor
+      tags:
+      - actors
+
+swagger: "2.0"

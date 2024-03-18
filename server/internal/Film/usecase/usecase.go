@@ -3,9 +3,9 @@ package usecase
 import (
 	// "fmt"
 	"regexp"
-	actorRep "server/server/internal/Actor/repository"
-	filmRep "server/server/internal/Film/repository"
-	"server/server/internal/domain/entity"
+	actorRep "server/internal/Actor/repository"
+	filmRep "server/internal/Film/repository"
+	"server/internal/domain/entity"
 )
 
 type FilmUsecaseI interface {

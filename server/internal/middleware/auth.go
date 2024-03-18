@@ -3,7 +3,7 @@ package middleware
 import (
 	"fmt"
 	"net/http"
-	sessionUsecase "server/server/internal/Session/usecase"
+	sessionUsecase "server/internal/Session/usecase"
 	"time"
 )
 

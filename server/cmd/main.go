@@ -10,26 +10,31 @@ import (
 	_ "github.com/lib/pq"
 	"log"
 	"net/http"
-	"server/server/config"
-	actorDel "server/server/internal/Actor/delivery"
-	actorRep "server/server/internal/Actor/repository/postgres"
-	actorUsecase "server/server/internal/Actor/usecase"
-	filmDel "server/server/internal/Film/delivery"
-	filmRep "server/server/internal/Film/repository/postgres"
-	filmUsecase "server/server/internal/Film/usecase"
-	sessionDel "server/server/internal/Session/delivery"
-	sessionRep "server/server/internal/Session/repository/redis"
-	sessionUsecase "server/server/internal/Session/usecase"
-	userRep "server/server/internal/User/repository/postgres"
-	"server/server/internal/middleware"
+	"server/config"
+	actorDel "server/internal/Actor/delivery"
+	actorRep "server/internal/Actor/repository/postgres"
+	actorUsecase "server/internal/Actor/usecase"
+	filmDel "server/internal/Film/delivery"
+	filmRep "server/internal/Film/repository/postgres"
+	filmUsecase "server/internal/Film/usecase"
+	sessionDel "server/internal/Session/delivery"
+	sessionRep "server/internal/Session/repository/redis"
+	sessionUsecase "server/internal/Session/usecase"
+	userRep "server/internal/User/repository/postgres"
+	"server/internal/middleware"
+	"time"
 )
+
+// @title Filmoteka API
+// @version 1.0
+// @license.name Apache 2.0
 
 const PORT = ":8080"
 
 var (
-	redisAddr = flag.String("addr", "redis://user:@localhost:6379/0", "redis addr")
+	redisAddr = flag.String("addr", "redis://redis-session:6379/0", "redis addr")
 
-	host     = "localhost"
+	host     = "test_postgres"
 	port     = 5432
 	user     = "uliana"
 	password = "uliana"
@@ -66,6 +71,8 @@ func main() {
 
 	router := mux.NewRouter()
 	authRouter := mux.NewRouter()
+
+	time.Sleep(5 * time.Second)
 
 	db, err := GetPostgres(psqlInfo)
 	if err != nil {

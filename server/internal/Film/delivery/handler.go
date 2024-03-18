@@ -6,9 +6,9 @@ import (
 	//"fmt"
 	"io/ioutil"
 	"net/http"
-	filmUsecase "server/server/internal/Film/usecase"
-	"server/server/internal/domain/entity"
-	mw "server/server/internal/middleware"
+	filmUsecase "server/internal/Film/usecase"
+	"server/internal/domain/entity"
+	mw "server/internal/middleware"
 	"strconv"
 
 	"github.com/gorilla/mux"

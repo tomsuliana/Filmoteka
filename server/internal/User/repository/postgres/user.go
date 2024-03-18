@@ -2,8 +2,8 @@ package postgres
 
 import (
 	"database/sql"
-	"server/server/internal/User/repository"
-	"server/server/internal/domain/entity"
+	"server/internal/User/repository"
+	"server/internal/domain/entity"
 )
 
 type UserRepo struct {

@@ -3,7 +3,7 @@ package repository
 import (
 	"encoding/json"
 	"github.com/gomodule/redigo/redis"
-	"server/server/internal/domain/entity"
+	"server/internal/domain/entity"
 	"sync"
 )
 

@@ -2,9 +2,9 @@ package usecase
 
 import (
 	"math/rand"
-	sessionRep "server/server/internal/Session/repository"
-	userRep "server/server/internal/User/repository"
-	"server/server/internal/domain/entity"
+	sessionRep "server/internal/Session/repository"
+	userRep "server/internal/User/repository"
+	"server/internal/domain/entity"
 	"time"
 )
 

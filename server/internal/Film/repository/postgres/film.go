@@ -2,8 +2,8 @@ package postgres
 
 import (
 	"database/sql"
-	"server/server/internal/Film/repository"
-	"server/server/internal/domain/entity"
+	"server/internal/Film/repository"
+	"server/internal/domain/entity"
 )
 
 type FilmRepo struct {

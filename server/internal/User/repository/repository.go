@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"server/server/internal/domain/entity"
+	"server/internal/domain/entity"
 )
 
 type UserRepositoryI interface {

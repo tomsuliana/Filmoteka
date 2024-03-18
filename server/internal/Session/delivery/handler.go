@@ -5,9 +5,9 @@ import (
 	"github.com/gorilla/mux"
 	"io/ioutil"
 	"net/http"
-	sessionUsecase "server/server/internal/Session/usecase"
-	"server/server/internal/domain/entity"
-	mw "server/server/internal/middleware"
+	sessionUsecase "server/internal/Session/usecase"
+	"server/internal/domain/entity"
+	mw "server/internal/middleware"
 	"time"
 )
 
@@ -39,6 +39,18 @@ func (handler *SessionHandler) RegisterHandler(router *mux.Router) {
 	router.HandleFunc("/api/login", handler.Login).Methods(http.MethodPost)
 }
 
+// Login godoc
+// @Summary      Log in user
+// @Description  Log in user
+// @Tags        users
+// @Accept     application/json
+// @Produce  application/json
+// @Param    user body User true "user object for login"
+// @Success  200 {object}  string "success login User return cookie"
+// @Failure 400 {object} error "bad request"
+// @Failure 404 {object} error "not found"
+// @Failure 500 {object} error "internal server error"
+// @Router   /api/login [post]
 func (handler *SessionHandler) Login(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
@@ -105,6 +117,15 @@ func (handler *SessionHandler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Logout godoc
+// @Summary      Log out user
+// @Description  Log out user
+// @Tags        users
+// @Param    cookie header string true "Log out user"
+// @Success 200 "void" "success log out"
+// @Failure 400 {object} error "bad request"
+// @Failure 401 {object} error "unauthorized"
+// @Router   /api/logout [delete]
 func (handler *SessionHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	cookie, _ := r.Cookie("session_id")
 	err := handler.sessions.Logout(&entity.Cookie{
