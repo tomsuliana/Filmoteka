@@ -23,6 +23,35 @@ definitions:
       Gender:
         type: string
     type: object
+  Actors:
+    type: array
+    items:
+      properties:
+        ID:
+          type: integer
+        Name:
+          type: string
+        Surname:
+          type: string
+        Birthday:
+          type: string
+        Gender:
+          type: string
+        Films:
+          type: array
+          items:
+            properties:
+              ID:
+                type: integer
+              Name:
+                type: string
+              Description:
+                type: string
+              ReleaseDate:
+                type: string
+              Rating:
+                type: number
+        
 info:
   termsOfService: http://swagger.io/terms/
   contact: {}
@@ -33,8 +62,6 @@ info:
 externalDocs:
   description: Find out more about Swagger
   url: http://swagger.io
-servers:
-  - url: https://petstore3.swagger.io/api/v3
 tags:
   - name: users
     description: Operations about users
@@ -100,6 +127,22 @@ paths:
       tags:
       - users
   /api/actors:
+    get:
+      description: Get list of actors with their films
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: actors got
+          schema: 
+            $ref: '#/definitions/Actors'
+        "400":
+          description: bad request
+        "401":
+          description: unauthorized or not admin
+      summary: Get list of actors with their films
+      tags:
+      - actors
     post:
       consumes:
       - application/json
