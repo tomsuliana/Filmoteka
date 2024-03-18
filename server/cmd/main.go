@@ -3,7 +3,9 @@ package main
 import (
 	"database/sql"
 	"errors"
+	"flag"
 	"fmt"
+	"github.com/gomodule/redigo/redis"
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
 	"log"
@@ -15,12 +17,18 @@ import (
 	filmDel "server/server/internal/Film/delivery"
 	filmRep "server/server/internal/Film/repository/postgres"
 	filmUsecase "server/server/internal/Film/usecase"
+	sessionDel "server/server/internal/Session/delivery"
+	sessionRep "server/server/internal/Session/repository/redis"
+	sessionUsecase "server/server/internal/Session/usecase"
+	userRep "server/server/internal/User/repository/postgres"
 	"server/server/internal/middleware"
 )
 
 const PORT = ":8080"
 
 var (
+	redisAddr = flag.String("addr", "redis://user:@localhost:6379/0", "redis addr")
+
 	host     = "localhost"
 	port     = 5432
 	user     = "uliana"
@@ -32,7 +40,6 @@ var (
 		host, port, user, password, dbname)
 )
 
-//GetPostgres gets postgres connection
 func GetPostgres(psqlInfo string) (*sql.DB, error) {
 
 	db, err := sql.Open("postgres", psqlInfo)
@@ -50,7 +57,16 @@ func GetPostgres(psqlInfo string) (*sql.DB, error) {
 }
 
 func main() {
+	flag.Parse()
+
+	redisConn, err := redis.DialURL(*redisAddr)
+	if err != nil {
+		log.Fatal("can`t connect to redis", err)
+	}
+
 	router := mux.NewRouter()
+	authRouter := mux.NewRouter()
+
 	db, err := GetPostgres(psqlInfo)
 	if err != nil {
 		fmt.Println(err, " ", psqlInfo)
@@ -76,18 +92,32 @@ func main() {
 	logger := middleware.NewACLog(baseLogger.Sugar(), errorLogger.Sugar())
 
 	actorRepo := actorRep.NewActorRepo(db)
-	actorUC := actorUsecase.NewActorUsecase(actorRepo)
+	filmRepo := filmRep.NewFilmRepo(db)
+	userRepo := userRep.NewUserRepo(db)
+	sessionRepo := sessionRep.NewSessionManager(redisConn)
+
+	actorUC := actorUsecase.NewActorUsecase(actorRepo, filmRepo)
 	actorHandler := actorDel.NewActorHandler(actorUC, logger)
 
-	filmRepo := filmRep.NewFilmRepo(db)
 	filmUC := filmUsecase.NewFilmUsecase(filmRepo, actorRepo)
 	filmHandler := filmDel.NewFilmHandler(filmUC, logger)
 
-	actorHandler.RegisterHandler(router)
-	filmHandler.RegisterHandler(router)
+	sessionUC := sessionUsecase.NewSessionUsecase(sessionRepo, userRepo)
+	sessionHandler := sessionDel.NewSessionHandler(sessionUC, logger)
+
+	actorHandler.RegisterHandler(authRouter)
+	filmHandler.RegisterHandler(authRouter)
+	sessionHandler.RegisterAuthHandler(authRouter)
+	sessionHandler.RegisterHandler(router)
+	authMW := middleware.NewSessionMiddleware(sessionUC, logger)
 
 	router.Use(middleware.PanicMiddleware)
 	router.Use(logger.ACLogMiddleware)
+	authRouter.Use(authMW.AuthMiddleware)
+
+	router.PathPrefix("/api/logout").Handler(authRouter)
+	router.PathPrefix("/api/actors").Handler(authRouter)
+	router.PathPrefix("/api/films").Handler(authRouter)
 
 	server := &http.Server{
 		Addr:    PORT,

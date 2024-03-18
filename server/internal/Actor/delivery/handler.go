@@ -36,6 +36,7 @@ func NewActorHandler(actors actorUsecase.ActorUsecaseI, logger *mw.ACLog) *Actor
 
 func (handler *ActorHandler) RegisterHandler(router *mux.Router) {
 	router.HandleFunc("/api/actors", handler.CreateActor).Methods(http.MethodPost)
+	router.HandleFunc("/api/actors", handler.GetActorList).Methods(http.MethodGet)
 	router.HandleFunc("/api/actors/{id:[0-9]+}", handler.UpdateActor).Methods(http.MethodPatch)
 	router.HandleFunc("/api/actors/{id:[0-9]+}", handler.DeleteActor).Methods(http.MethodDelete)
 }
@@ -168,6 +169,29 @@ func (handler *ActorHandler) DeleteActor(w http.ResponseWriter, r *http.Request)
 	err = handler.actors.DeleteActor(id)
 	if err != nil {
 		handler.logger.LogError("problems deleting person", err, w.Header().Get("request-id"), r.URL.Path)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+}
+
+func (handler *ActorHandler) GetActorList(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	actors, err := handler.actors.GetActors()
+
+	if err != nil {
+		handler.logger.LogError("problems with getting actors", err, w.Header().Get("request-id"), r.URL.Path)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	body := actors
+
+	encoder := json.NewEncoder(w)
+	err = encoder.Encode(&Result{Body: body})
+
+	if err != nil {
+		handler.logger.LogError("problems with marshalling json", err, w.Header().Get("request-id"), r.URL.Path)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

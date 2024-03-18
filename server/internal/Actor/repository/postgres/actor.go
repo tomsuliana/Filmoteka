@@ -112,3 +112,33 @@ func (repo *ActorRepo) SearchActors(word string) ([]*entity.Actor, error) {
 	}
 	return Actors, nil
 }
+
+func (repo *ActorRepo) GetActors() ([]*entity.Actor, error) {
+	actorQuery := `SELECT id, name, surname, birthday, gender
+													FROM actor`
+
+	rows, err := repo.DB.Query(actorQuery)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
+	defer rows.Close()
+	var Actors = []*entity.Actor{}
+	for rows.Next() {
+		actor := &entity.Actor{}
+		err = rows.Scan(
+			&actor.ID,
+			&actor.Name,
+			&actor.Surname,
+			&actor.Birthday,
+			&actor.Gender,
+		)
+		if err != nil {
+			return nil, err
+		}
+		Actors = append(Actors, actor)
+	}
+	return Actors, nil
+}

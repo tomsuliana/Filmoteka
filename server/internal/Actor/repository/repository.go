@@ -11,4 +11,5 @@ type ActorRepositoryI interface {
 	DeleteActor(id uint) error
 	GetActorByName(name string, surname string) (uint, error)
 	SearchActors(word string) ([]*entity.Actor, error)
+	GetActors() ([]*entity.Actor, error)
 }

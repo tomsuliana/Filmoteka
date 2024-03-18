@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"regexp"
 	actorRep "server/server/internal/Actor/repository"
+	filmRep "server/server/internal/Film/repository"
 	"server/server/internal/domain/entity"
 )
 
@@ -11,15 +12,18 @@ type ActorUsecaseI interface {
 	CreateActor(newActor *entity.Actor) (uint, error)
 	UpdateActor(newActor *entity.Actor) error
 	DeleteActor(id uint) error
+	GetActors() ([]*entity.ActorWithFilms, error)
 }
 
 type ActorUsecase struct {
 	actorRepo actorRep.ActorRepositoryI
+	filmRepo  filmRep.FilmRepositoryI
 }
 
-func NewActorUsecase(actorRepI actorRep.ActorRepositoryI) *ActorUsecase {
+func NewActorUsecase(actorRepI actorRep.ActorRepositoryI, filmRepI filmRep.FilmRepositoryI) *ActorUsecase {
 	return &ActorUsecase{
 		actorRepo: actorRepI,
+		filmRepo:  filmRepI,
 	}
 }
 
@@ -91,4 +95,24 @@ func (au ActorUsecase) DeleteActor(id uint) error {
 		return err
 	}
 	return nil
+}
+
+func (au ActorUsecase) GetActors() ([]*entity.ActorWithFilms, error) {
+	actors, err := au.actorRepo.GetActors()
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Printf("actors: %v\n", actors)
+	actorsWithFilms := []*entity.ActorWithFilms{}
+	for _, actor := range actors {
+		films, err := au.filmRepo.GetFilmsByActor(actor)
+		if err != nil && err != entity.ErrNotFound {
+			return nil, err
+		}
+		actorWithFilms := entity.ToActorWithFilms(actor, films)
+		actorsWithFilms = append(actorsWithFilms, actorWithFilms)
+	}
+
+	return actorsWithFilms, nil
 }
