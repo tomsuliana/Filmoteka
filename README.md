@@ -5,5 +5,5 @@
 
 #### Запуск тестов и проверка покрытия в папке internal
 
-```go1.19 test -coverprofile=c.out ./...
-   go1.19 tool cover -func c.out | grep total```
+```go1.19 test -coverprofile=c.out ./...```
+```go1.19 tool cover -func c.out | grep total```
