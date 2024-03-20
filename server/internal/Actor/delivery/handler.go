@@ -70,7 +70,6 @@ func (handler *ActorHandler) CreateActor(w http.ResponseWriter, r *http.Request)
 	id, err := handler.actors.CreateActor(&reqActor)
 	if err != nil {
 		handler.logger.LogError("problems with creating actor", err, w.Header().Get("request-id"), r.URL.Path)
-		//fmt.Println(err)
 		if err == entity.ErrInvalidBirthday {
 			w.WriteHeader(http.StatusBadRequest)
 		} else if err == entity.ErrInvalidGender {

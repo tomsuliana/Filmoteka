@@ -73,7 +73,6 @@ func (handler *FilmHandler) CreateFilm(w http.ResponseWriter, r *http.Request) {
 	id, err := handler.films.CreateFilm(&reqFilm)
 	if err != nil {
 		handler.logger.LogError("problems with creating film", err, w.Header().Get("request-id"), r.URL.Path)
-		//fmt.Println(err)
 		if err == entity.ErrInvalidName || err == entity.ErrInvalidDescription || err == entity.ErrInvalidReleaseDate || err == entity.ErrInvalidRating {
 			w.WriteHeader(http.StatusBadRequest)
 		} else {
@@ -135,7 +134,6 @@ func (handler *FilmHandler) UpdateFilm(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		//fmt.Println(err)
 		if err == entity.ErrInvalidName || err == entity.ErrInvalidDescription || err == entity.ErrInvalidReleaseDate || err == entity.ErrInvalidRating {
 			w.WriteHeader(http.StatusBadRequest)
 		} else {

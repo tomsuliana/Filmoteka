@@ -1,7 +1,6 @@
 package usecase
 
 import (
-	"fmt"
 	"regexp"
 	actorRep "server/internal/Actor/repository"
 	filmRep "server/internal/Film/repository"
@@ -78,7 +77,6 @@ func (au ActorUsecase) UpdateActor(newActor *entity.Actor) error {
 func (au ActorUsecase) checkFields(newActor *entity.Actor) error {
 	re := regexp.MustCompile(`\d{4}-\d{1,2}-\d{1,2}`)
 	if !re.MatchString(newActor.Birthday) {
-		fmt.Println(newActor.Birthday)
 		return entity.ErrInvalidBirthday
 	}
 
@@ -103,7 +101,6 @@ func (au ActorUsecase) GetActors() ([]*entity.ActorWithFilms, error) {
 		return nil, err
 	}
 
-	fmt.Printf("actors: %v\n", actors)
 	actorsWithFilms := []*entity.ActorWithFilms{}
 	for _, actor := range actors {
 		films, err := au.filmRepo.GetFilmsByActor(actor)
